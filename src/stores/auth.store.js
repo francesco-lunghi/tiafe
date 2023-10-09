@@ -34,7 +34,7 @@ export const useAuthStore = defineStore({
         var bodyFormData = new FormData();
         bodyFormData.append('username', username);
         bodyFormData.append('password', password);
-        const user = await axios.post(ApiService.getBaseUrl() + 'auth/jwt/login', bodyFormData)
+        const user = await axios.post(ApiService.getAuthBaseUrl() + 'login', bodyFormData)
 
         // update pinia state
         this.user = user.data
@@ -51,7 +51,7 @@ export const useAuthStore = defineStore({
       }
     },
     async logout() {
-      await axios.post(ApiService.getBaseUrl() + 'auth/jwt/logout')
+      await axios.post(ApiService.getAuthBaseUrl() + 'logout')
       this.user = null
       sessionStorage.removeItem('user')
       this.router.push('/login')

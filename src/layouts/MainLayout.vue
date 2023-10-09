@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          TheDalus Dashboard
+          Trust In Ageing
         </q-toolbar-title>
 
         <div>Quasar v{{ $q.version }}</div>
@@ -53,13 +53,13 @@ const linksList = [
   {
     title: 'Dashboard',
     caption: 'Main',
-    icon: 'school',
+    icon: 'dashboard',
     link: '/'
   },
   {
     title: 'Data Viewer',
     caption: 'data viewer',
-    icon: 'database',
+    icon: 'timeline',
     link: '/data'
   },
 ]

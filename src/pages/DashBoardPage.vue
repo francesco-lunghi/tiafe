@@ -149,7 +149,6 @@
 import { defineComponent, onMounted, ref, reactive, inject } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
 
-import SkeletonViewer from 'src/components/MultipleSkeletonViewer.vue'
 export default defineComponent({
   name: 'DashBoardPage',
   components: {},

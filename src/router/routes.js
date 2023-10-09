@@ -6,7 +6,7 @@ const routes = [
     children: [
       { path: '', component: () => import('pages/DashBoardPage.vue') },
 
-      // { path: 'data', component: () => import('src/pages/SkeletonsPage.vue') },
+      { path: 'data', component: () => import('src/pages/DataViewerPage.vue') },
       {
         path: 'login',
         // meta:

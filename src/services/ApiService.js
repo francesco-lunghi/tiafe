@@ -3,9 +3,10 @@ import { useAuthStore } from "../stores/auth.store"
 
 
 const instance = axios.create({
-  baseURL: 'http://localhost:8000/',
-  baseURLDocker: 'http://localhost:8000/',
-  baseURLProd: '/',
+  baseURL: 'http://localhost:8000/api/v1/',
+  baseURLDocker: 'http://localhost:8000/api/v1/',
+  baseURLProd: '/api/v1/',
+  authBaseURL: 'http://localhost:8000/auth/jwt/'
   //timeout: config.apiServer.timeout
 })
 
@@ -35,6 +36,9 @@ instance.interceptors.response.use(function (response) {
 const ApiService = {
   getBaseUrl() {
     return instance.defaults.baseURL
+  },
+  getAuthBaseUrl() {
+    return instance.defaults.authBaseURL
   },
   get(url, config = {}) {
     return instance.get(url, config)
