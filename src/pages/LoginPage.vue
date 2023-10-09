@@ -55,6 +55,7 @@ export default {
   name: 'LoginPage',
   data() {
     onMounted(() => {
+      auth.logout(false)
     })
     const email = ref('')
     const password = ref('')

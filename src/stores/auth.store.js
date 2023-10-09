@@ -7,7 +7,7 @@ export const useAuthStore = defineStore({
   state: () => ({
     // initialize state from local storage to enable user to stay logged in
     //TODO: use sessionStorage?
-    user: JSON.parse(sessionStorage.getItem('user')),
+    user: sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')) : null,
     returnUrl: null, // the url to reroute to when done loggin in
     router: null
   }),
@@ -50,11 +50,14 @@ export const useAuthStore = defineStore({
         alert('impossibile effettuare il login')
       }
     },
-    async logout() {
-      await axios.post(ApiService.getAuthBaseUrl() + 'logout')
+    async logout(toLogin=true) {
       this.user = null
       sessionStorage.removeItem('user')
-      this.router.push('/login')
+      await axios.post(ApiService.getAuthBaseUrl() + 'logout')
+
+      if (toLogin)
+        this.router.push('/login')
     }
+
   }
 })

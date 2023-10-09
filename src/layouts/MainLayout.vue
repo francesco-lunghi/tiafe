@@ -16,6 +16,8 @@
         </q-toolbar-title>
 
         <div>Quasar v{{ $q.version }}</div>
+        <!-- Logout button -->
+      <q-btn @click="$router.push('/login')">Logout</q-btn>
       </q-toolbar>
     </q-header>
 
@@ -48,6 +50,7 @@
 <script>
 import { defineComponent, ref } from 'vue'
 import EssentialLink from 'components/EssentialLink.vue'
+import { useRouter } from 'vue-router' // <- import useRouter here
 
 const linksList = [
   {
@@ -73,6 +76,7 @@ export default defineComponent({
 
   setup () {
     const leftDrawerOpen = ref(false)
+    const router = useRouter()
 
     return {
       essentialLinks: linksList,
