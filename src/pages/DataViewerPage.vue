@@ -38,12 +38,14 @@
 //import example from 'assets/example.json'
 import { defineComponent, onMounted, ref, reactive, inject } from 'vue'
 import ApiService from 'src/services/ApiService'
+import { useRouter } from 'vue-router' // <- import useRouter here
 
 export default defineComponent({
   name: 'DataViewerPage',
   components: {},
   setup() {
     const acquisitions = ref({})
+    const router = useRouter()
 
     onMounted(() => {
       ApiService.get('acquisitions').then((response) => {
@@ -52,7 +54,7 @@ export default defineComponent({
             acquisitions.value  = response.data
           })
           .catch((e) => {
-            router.push('/404')
+            router.push('/403')
           })
     })
 

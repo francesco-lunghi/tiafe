@@ -17,7 +17,8 @@
 
         <div>Quasar v{{ $q.version }}</div>
         <!-- Logout button -->
-      <q-btn @click="$router.push('/login')">Logout</q-btn>
+      <!-- <q-btn @click="$router.push('/login')">Logout</q-btn> -->
+      <q-btn class="q-ml-lg" @click="auth.logout()">Logout</q-btn>
       </q-toolbar>
     </q-header>
 
@@ -50,14 +51,15 @@
 <script>
 import { defineComponent, ref } from 'vue'
 import EssentialLink from 'components/EssentialLink.vue'
-import { useRouter } from 'vue-router' // <- import useRouter here
+// import { useRouter } from 'vue-router' // <- import useRouter here
+import { useAuthStore } from '../stores/auth.store.js'
 
 const linksList = [
   {
     title: 'Dashboard',
     caption: 'Main',
     icon: 'dashboard',
-    link: '/'
+    link: '/dashboard'
   },
   {
     title: 'Data Viewer',
@@ -75,15 +77,17 @@ export default defineComponent({
   },
 
   setup () {
+    const auth = useAuthStore()
     const leftDrawerOpen = ref(false)
-    const router = useRouter()
+    // const router = useRouter()
 
     return {
       essentialLinks: linksList,
       leftDrawerOpen,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
-      }
+      },
+      auth
     }
   }
 })

@@ -50,11 +50,10 @@ export const useAuthStore = defineStore({
         alert('impossibile effettuare il login')
       }
     },
-    async logout(toLogin=true) {
+    async logout(toLogin = true) {
+      //await axios.post(ApiService.getAuthBaseUrl() + 'logout')
       this.user = null
       sessionStorage.removeItem('user')
-      await axios.post(ApiService.getAuthBaseUrl() + 'logout')
-
       if (toLogin)
         this.router.push('/login')
     }
