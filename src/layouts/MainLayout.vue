@@ -2,14 +2,7 @@
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
         <q-toolbar-title>
           Trust In Ageing
@@ -17,28 +10,18 @@
 
         <div>Quasar v{{ $q.version }}</div>
         <!-- Logout button -->
-      <!-- <q-btn @click="$router.push('/login')">Logout</q-btn> -->
-      <q-btn class="q-ml-lg" @click="auth.logout()">Logout</q-btn>
+        <!-- <q-btn @click="$router.push('/login')">Logout</q-btn> -->
+        <q-btn class="q-ml-lg" @click="auth.logout()">Logout</q-btn>
       </q-toolbar>
     </q-header>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-
-      bordered
-    >
+    <q-drawer v-model="leftDrawerOpen" bordered>
       <q-list>
-        <q-item-label
-          header
-        >
+        <q-item-label header>
           Essential Links
         </q-item-label>
 
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
+        <EssentialLink v-for="link in essentialLinks" :key="link.title" v-bind="link" />
       </q-list>
     </q-drawer>
 
@@ -76,7 +59,7 @@ export default defineComponent({
     EssentialLink
   },
 
-  setup () {
+  setup() {
     const auth = useAuthStore()
     const leftDrawerOpen = ref(false)
     // const router = useRouter()
@@ -84,7 +67,7 @@ export default defineComponent({
     return {
       essentialLinks: linksList,
       leftDrawerOpen,
-      toggleLeftDrawer () {
+      toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value
       },
       auth
