@@ -1,8 +1,8 @@
 {
-  "name": "thedalusvisualizer",
+  "name": "tiafe",
   "version": "0.0.1",
-  "description": "Skeleton and data visualizer for TheDalus",
-  "productName": "TheDalusVisualizer",
+  "description": "kinect stations and database management for TrustInAgeing stack",
+  "productName": "TrustInAgeing Frontend",
   "author": "francesco-lunghi <francesco.lunghi@outlook.com>",
   "private": true,
   "scripts": {
