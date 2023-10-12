@@ -19,7 +19,7 @@
       </q-item-section>
     </q-toolbar> -->
 
-    <q-table title="Acquisitions" :rows="acquisitions" :columns="columns" row-key="acquisitionId">
+    <q-table title="Acquisitions" :rows="acquisitions" :columns="columns" row-key="acquisitionId" :filter="filter">
       <template v-slot:top-right>
         <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
           <template v-slot:append>
@@ -97,6 +97,7 @@ export default defineComponent({
   setup() {
     const acquisitions = ref([])
     const router = useRouter()
+
     // const formatArray = (row, column) => {
     //   if (Array.isArray(row.kinects)) {
     //     return row.kinects.map((value) => {
@@ -172,7 +173,8 @@ export default defineComponent({
       btnclick,
       handleButtonClick,
       downloadAcquisition,
-      downloadKinect
+      downloadKinect,
+      filter: ref('')
 
 
     }
