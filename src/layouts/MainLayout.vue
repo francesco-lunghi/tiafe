@@ -8,7 +8,7 @@
           Trust In Ageing
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <!-- <div>Quasar v{{ $q.version }}</div> -->
         <!-- Logout button -->
         <!-- <q-btn @click="$router.push('/login')">Logout</q-btn> -->
         <q-btn class="q-ml-lg" @click="auth.logout()">Logout</q-btn>

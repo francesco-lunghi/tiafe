@@ -1,6 +1,6 @@
 <template>
   <q-page>
-
+<!--
     <q-toolbar class="bg-grey-3 shadow-2">
       <q-icon name="build_circle" size="2rem" color="blue" />
       <q-item-section>
@@ -17,10 +17,16 @@
           </div>
         </div>
       </q-item-section>
-      <!-- <q-btn flat round dense icon="refresh" @click="pingStatus" /> -->
-    </q-toolbar>
+    </q-toolbar> -->
 
     <q-table title="Acquisitions" :rows="acquisitions" :columns="columns" row-key="acquisitionId">
+      <template v-slot:top-right>
+        <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </template>
       <template v-slot:header="props">
         <q-tr :props="props">
           <q-th auto-width />
@@ -50,15 +56,16 @@
             <q-list bordered separator>
               <q-item v-for="kinect in props.row.kinects" :key="kinect.subscriberId">
 
-              <q-item-section>
-                <q-item-label>{{ kinect.subscriberId }}</q-item-label>
-                <q-item-label caption lines="1">{{ kinect.subscriberInfo}}</q-item-label>
-              </q-item-section>
+                <q-item-section>
+                  <q-item-label>{{ kinect.subscriberId }}</q-item-label>
+                  <q-item-label caption lines="1">{{ kinect.subscriberInfo }}</q-item-label>
+                </q-item-section>
 
-              <q-item-section side>
-                <q-btn @click="downloadKinect(props.row.acquisitionId,kinect.subscriberId  )" size="sm" color="green" round dense  icon="download">
-                </q-btn>
-              </q-item-section>
+                <q-item-section side>
+                  <q-btn @click="downloadKinect(props.row.acquisitionId, kinect.subscriberId)" size="sm" color="green"
+                    round dense icon="download">
+                  </q-btn>
+                </q-item-section>
               </q-item>
             </q-list>
             <div class="text-left">This is expand slot for row above: {{ props.row.acquisitionId }}.</div>
@@ -125,52 +132,6 @@ export default defineComponent({
         { name: 'action', label: 'Action', field: 'action' }
       ]
     )
-    const rows = ref([
-      {
-        id: 1,
-        name: 'Frozen Yogurt',
-        details: 'A frozen dessert made with yogurt and sometimes other dairy products including non-dairy products',
-        calories: 159,
-        calcium: '14%',
-        iron: '1%',
-        action: 1
-      },
-      {
-        id: 2,
-        name: 'Ice cream sandwich',
-        details: 'A frozen dessert consisting of ice cream between two skins, crusts, or other similar biscuit',
-        calories: 237,
-        calcium: '8%',
-        iron: '1%',
-        action: 2
-      },
-      {
-        id: 3,
-        name: 'Eclair',
-        details: 'An oblong pastry made with choux dough filled with a cream and topped with chocolate icing',
-        calories: 262,
-        calcium: '6%',
-        iron: '7%',
-        action: 3
-      }
-    ])
-    const actionButtons = ref([
-      {
-        name: 'Edit',
-        icon: 'edit',
-        color: 'blue-9'
-      },
-      {
-        name: 'Delete',
-        icon: 'delete',
-        color: 'red-9'
-      },
-      {
-        name: 'Log',
-        icon: 'list',
-        color: 'orange-9'
-      }
-    ])
     const onRowClick = (evt, row) => {
       console.log('clicked on', row)
     }
@@ -206,9 +167,7 @@ export default defineComponent({
 
     return {
       acquisitions,
-      rows,
       columns,
-      actionButtons,
       onRowClick,
       btnclick,
       handleButtonClick,
