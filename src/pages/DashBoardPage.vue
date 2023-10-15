@@ -43,8 +43,8 @@
           <q-btn
             size="md"
             round
-            :color="getColorFromStatus(k.available)"
-            :icon="getIconFromStatus(k.available)"
+            :color="getColorFromStatus(k.Available)"
+            :icon="getIconFromStatus(k.Available)"
             @click="disconnectStation(k)"
           />
           <!-- <q-avatar :color="getColorFromStatus(k.available)" text-color="white">
@@ -59,26 +59,26 @@
               <div>
                 <q-spinner-radio
                   class="q-mx-md"
-                  v-if="k.reader === 'running'"
+                  v-if="k.Reader === 'running'"
                   color="primary"
                   size="2em"
                 />
               </div>
               <q-item-label
-                ><span class="text-h6">{{ k.subscriberId }}</span></q-item-label
+                ><span class="text-h6">{{ k.SubscriberId }}</span></q-item-label
               >
             <q-separator class="q-my-sm"  />
             <div style="width:200px;max-width:200px;"
              >
               <q-item-label caption lines="1">{{
-                k.topicPrefix + " ver (" + k.version + ")"
+                k.TopicPrefix + " ver (" + k.Version + ")"
               }}</q-item-label>
               <!-- <q-item-label caption lines="1">{{
                 k.version
               }}</q-item-label> -->
             <q-separator class="q-my-sm"  />
               <q-item-label caption lines="3">{{
-                k.subscriberInfo
+                k.SubscriberInfo
               }}</q-item-label>
             </div>
             </div>
@@ -88,7 +88,7 @@
                 style="max-width: 250px; height: 150px; min-width: 250px"
                 fit="scale-down"
                 no-transition
-                :src="previews[k.subscriberId]"
+                :src="previews[k.SubscriberId]"
 
               >
                 <template v-slot:error>
@@ -117,7 +117,7 @@
             <q-btn
               flat
               round
-              :icon="getIconFromActivity(k.reader)"
+              :icon="getIconFromActivity(k.Reader)"
               @click="toggle(k)"
               size="1.5em"
             >
@@ -161,7 +161,7 @@ export default defineComponent({
       connect()
     })
     function updateSkeleton(k) {
-      kinects[k].skeletons = 0
+      kinects[k].Skeletons = 0
     }
     function connect() {
       mqtt.setOnMessageArrived(onMessageArrived)
@@ -176,7 +176,7 @@ export default defineComponent({
       else if (activity === 'paused') return 'grey'
     }
     function getSaveAvi(kinect) {
-      if (kinect.streamingInterval == 1000)
+      if (kinect.StreamingInterval == 1000)
       return true
     else return false
     }
@@ -186,17 +186,17 @@ export default defineComponent({
       // else
       //   kinect.streamingInterval = 1000
       let command = "stream:"
-      if (kinect.streamingInterval != -1)
+      if (kinect.StreamingInterval != -1)
         command += "-1"
       else
         command += "1000"
-      mqtt.publish(kinect.topicPrefix + '/'  + kinect.subscriberId + '/ctrl', command)
+      mqtt.publish(kinect.TopicPrefix + '/'  + kinect.SubscriberId + '/ctrl', command)
 
     }
     function getColorFromPreview(kinect) {
       // if (kinect.preview) return 'primary'
       // else return 'grey'
-      if (kinect.streamingInterval >= 0) return 'primary'
+      if (kinect.StreamingInterval >= 0) return 'primary'
       else return 'grey'
 
     }
@@ -238,7 +238,7 @@ export default defineComponent({
         case 'status':
           // ignore my own message
           const payload = JSON.parse(message.payloadString)
-          kinects[payload.subscriberId] = payload
+          kinects[payload.SubscriberId] = payload
           break
         case 'snapshot':
           let base64String = ''
@@ -284,9 +284,9 @@ export default defineComponent({
     }
     function toggle(kinect) {
       let command = 'stop'
-      if (kinect.reader !== 'running')
+      if (kinect.Reader !== 'running')
         command = 'start:' + new Date().toISOString().replaceAll(':', '.') //+ uuidv4()
-      mqtt.publish(kinect.topicPrefix + '/' + kinect.subscriberId + '/ctrl', command)
+      mqtt.publish(kinect.TopicPrefix + '/' + kinect.SubscriberId + '/ctrl', command)
     }
     /*
           // togglePreview(kinect)
@@ -302,7 +302,7 @@ export default defineComponent({
 
       // if (kinect.preview) {
       let command = 'snapshot'
-      mqtt.publish(kinect.topicPrefix + '/'  + kinect.subscriberId + '/ctrl', command)
+      mqtt.publish(kinect.TopicPrefix + '/'  + kinect.SubscriberId + '/ctrl', command)
       //   //if (kinect.reader === 'running')
       //   kinect.previewInterval = setInterval(()=>{
       //     mqtt.publish('kv2/' + kinect.subscriberId + '/ctrl', command)}, 1000)
@@ -314,7 +314,7 @@ export default defineComponent({
     function disconnectStation(kinect) {
       // if (kinect.version == 'k4a')
 
-      mqtt.publish(kinect.topicPrefix + '/'  + kinect.subscriberId + '/ctrl', 'quit')
+      mqtt.publish(kinect.TopicPrefix + '/'  + kinect.SubscriberId + '/ctrl', 'quit')
       setTimeout(pingStatus, 3000)
     }
     function startAll() {
@@ -338,7 +338,7 @@ export default defineComponent({
       else return 'preview_not_available' //"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEXMzMyWlpaqqqq3t7fFxcW+vr6xsbGjo6OcnJyLKnDGAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg=="
     }
     function getSkeletonCount(kinect) {
-      if ('skeletons' in kinect) return kinect.skeletons
+      if ('skeletons' in kinect) return kinect.Skeletons
       else return 0
     }
 
