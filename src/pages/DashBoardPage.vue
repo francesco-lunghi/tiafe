@@ -161,7 +161,7 @@ export default defineComponent({
       connect()
     })
     function updateSkeleton(k) {
-      kinects[k].Skeletons = 0
+      kinects[k].skeletons = 0
     }
     function connect() {
       mqtt.setOnMessageArrived(onMessageArrived)
@@ -262,9 +262,9 @@ export default defineComponent({
           const ooo = JSON.parse(jsonMessage)
           // console.log(ooo.  quanti scheletri e poi fare disegnetto
           // THIS GIVES AN ERROR WITH K4A sensors
-          // kinects[publisher].skeletons = Math.max(
-          //   ...ooo.map((x) => x['S'].length)
-          // )
+          kinects[publisher].skeletons = Math.max(
+            ...ooo.map((x) => x['S'].length)
+          )
           kinects[publisher].lastSampleTime = Date.now(); //Date.parse(ooo[ooo.length - 1].ST)
           setTimeout(() => {
             console.log(getSecondsDiff(Date.now(), kinects[publisher].lastSampleTime ))
@@ -338,7 +338,7 @@ export default defineComponent({
       else return 'preview_not_available' //"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEXMzMyWlpaqqqq3t7fFxcW+vr6xsbGjo6OcnJyLKnDGAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg=="
     }
     function getSkeletonCount(kinect) {
-      if ('skeletons' in kinect) return kinect.Skeletons
+      if ('skeletons' in kinect) return kinect.skeletons
       else return 0
     }
 

@@ -19,7 +19,7 @@
       </q-item-section>
     </q-toolbar> -->
 
-    <q-table title="Acquisitions" :rows="acquisitions" :columns="columns" row-key="acquisitionId" :filter="filter">
+    <q-table title="Acquisitions" :rows="acquisitions" :columns="columns" row-key="AcquisitionId" :filter="filter">
       <template v-slot:top-right>
         <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
           <template v-slot:append>
@@ -47,28 +47,28 @@
             {{ col.value }}
           </q-td>
           <q-td auto-width>
-            <q-btn size="sm" color="blue" round dense @click="downloadAcquisition(props.row.acquisitionId)"
+            <q-btn size="sm" color="blue" round dense @click="downloadAcquisition(props.row.AcquisitionId)"
               icon="download" />
           </q-td>
         </q-tr>
         <q-tr v-show="props.expand" :props="props">
           <q-td colspan="100%">
             <q-list bordered separator>
-              <q-item v-for="kinect in props.row.kinects" :key="kinect.subscriberId">
+              <q-item v-for="kinect in props.row.kinects" :key="kinect.SubscriberId">
 
                 <q-item-section>
-                  <q-item-label>{{ kinect.subscriberId }}</q-item-label>
-                  <q-item-label caption lines="1">{{ kinect.subscriberInfo }}</q-item-label>
+                  <q-item-label>{{ kinect.SubscriberId }}</q-item-label>
+                  <q-item-label caption lines="1">{{ kinect.SubscriberInfo }}</q-item-label>
                 </q-item-section>
 
                 <q-item-section side>
-                  <q-btn @click="downloadKinect(props.row.acquisitionId, kinect.subscriberId)" size="sm" color="green"
+                  <q-btn @click="downloadKinect(props.row.AcquisitionId, kinect.SubscriberId)" size="sm" color="green"
                     round dense icon="download">
                   </q-btn>
                 </q-item-section>
               </q-item>
             </q-list>
-            <div class="text-left">This is expand slot for row above: {{ props.row.acquisitionId }}.</div>
+            <!-- <div class="text-left">This is expand slot for row above: {{ props.row.AcquisitionId }}.</div> -->
           </q-td>
         </q-tr>
       </template>
@@ -110,11 +110,11 @@ export default defineComponent({
     const columns = ref(
       [
         {
-          name: 'acquisitionId',
+          name: 'AcquisitionId',
           required: true,
-          label: 'acquisitionId',
+          label: 'AcquisitionId',
           align: 'left',
-          field: row => row.acquisitionId,
+          field: row => row.AcquisitionId,
           format: val => `${val}`,
           sortable: true
         },
@@ -139,11 +139,11 @@ export default defineComponent({
     const btnclick = (id, name) => {
       console.log('Button Click', id, name)
     }
-    const downloadAcquisition = (acquisitionId) => {
-      console.log("downloading acquisition " + acquisitionId)
+    const downloadAcquisition = (AcquisitionId) => {
+      console.log("downloading acquisition " + AcquisitionId)
     }
-    const downloadKinect = (acquisitionId, subscriberId) => {
-      console.log("downloading acquisition " + acquisitionId + " kinect: " + subscriberId)
+    const downloadKinect = (AcquisitionId, subscriberId) => {
+      console.log("downloading acquisition " + AcquisitionId + " kinect: " + subscriberId)
     }
     const handleButtonClick = (value) => {
       // Do something with the clicked value
@@ -157,7 +157,7 @@ export default defineComponent({
         const r = response.data
         acquisitions.value = []
         for (let k of Object.keys(r)) {
-          const row = { 'acquisitionId': k, 'kinects': r[k] }
+          const row = { 'AcquisitionId': k, 'kinects': r[k] }
           acquisitions.value.push(row)
         }
       })
