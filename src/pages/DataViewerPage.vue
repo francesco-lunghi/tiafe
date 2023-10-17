@@ -1,6 +1,6 @@
 <template>
   <q-page>
-<!--
+    <!--
     <q-toolbar class="bg-grey-3 shadow-2">
       <q-icon name="build_circle" size="2rem" color="blue" />
       <q-item-section>
@@ -54,16 +54,16 @@
         <q-tr v-show="props.expand" :props="props">
           <q-td colspan="100%">
             <q-list bordered separator>
-              <q-item v-for="kinect in props.row.kinects" :key="kinect.SubscriberId">
+              <q-item v-for="kinect in props.row.kinects" :key="kinect.StationId">
 
                 <q-item-section>
-                  <q-item-label>{{ kinect.SubscriberId }}</q-item-label>
-                  <q-item-label caption lines="1">{{ kinect.SubscriberInfo }}</q-item-label>
+                  <q-item-label>{{ kinect.StationId }}</q-item-label>
+                  <q-item-label caption lines="1">{{ kinect.StationInfo }}</q-item-label>
                 </q-item-section>
 
                 <q-item-section side>
-                  <q-btn @click="downloadKinect(props.row.AcquisitionId, kinect.SubscriberId)" size="sm" color="green"
-                    round dense icon="download">
+                  <q-btn @click="downloadKinect(props.row.AcquisitionId, kinect.StationId)" size="sm" color="green" round
+                    dense icon="download">
                   </q-btn>
                 </q-item-section>
               </q-item>
@@ -77,7 +77,7 @@
       <q-item v-for="(kinects, acqId) in acquisitions" :key="acqId" class="q-my-sm">
         <q-item-section avatar>
           <p>{{ acqId }}</p>
-          <p v-for="subItem in kinects" :key="subItem">{{ subItem.subscriberId }}</p>
+          <p v-for="subItem in kinects" :key="subItem">{{ subItem.stationId }}</p>
         </q-item-section>
       </q-item>
     </q-list>
@@ -142,8 +142,8 @@ export default defineComponent({
     const downloadAcquisition = (AcquisitionId) => {
       console.log("downloading acquisition " + AcquisitionId)
     }
-    const downloadKinect = (AcquisitionId, subscriberId) => {
-      console.log("downloading acquisition " + AcquisitionId + " kinect: " + subscriberId)
+    const downloadKinect = (AcquisitionId, stationId) => {
+      console.log("downloading acquisition " + AcquisitionId + " kinect: " + stationId)
     }
     const handleButtonClick = (value) => {
       // Do something with the clicked value

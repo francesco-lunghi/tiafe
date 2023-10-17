@@ -9,93 +9,55 @@
           </div>
           <q-separator vertical />
           <div>
-            <q-btn
-              flat
-              round
-              dense
-              icon="play_arrow"
-              @click="startAll()"
-              :disable="Object.keys(kinects).length === 0"
-            >
+            <q-btn flat round dense icon="play_arrow" @click="startAll()" :disable="Object.keys(kinects).length === 0">
             </q-btn>
           </div>
           <div>
-            <q-btn
-              flat
-              round
-              dense
-              icon="stop"
-              :disable="Object.keys(kinects).length === 0"
-              @click="stopAll()"
-            >
+            <q-btn flat round dense icon="stop" :disable="Object.keys(kinects).length === 0" @click="stopAll()">
             </q-btn>
-          </div></div
-      ></q-item-section>
+          </div>
+        </div>
+      </q-item-section>
       <q-btn flat round dense icon="refresh" @click="pingStatus" />
     </q-toolbar>
     <q-list bordered dense>
-      <q-item
-        v-for="(k, subscriberId) in kinects"
-        :key="subscriberId"
-        class="q-my-sm"
-      >
+      <q-item v-for="(k, StationId) in kinects" :key="StationId" class="q-my-sm">
         <q-item-section avatar>
-          <q-btn
-            size="md"
-            round
-            :color="getColorFromStatus(k.Available)"
-            :icon="getIconFromStatus(k.Available)"
-            @click="disconnectStation(k)"
-          />
+          <q-btn size="md" round :color="getColorFromStatus(k.Available)" :icon="getIconFromStatus(k.Available)"
+            @click="disconnectStation(k)" />
           <!-- <q-avatar :color="getColorFromStatus(k.available)" text-color="white">
-            {{ k.subscriberId }}
+            {{ k.stationId }}
           </q-avatar> -->
         </q-item-section>
 
         <q-separator class="q-mr-md" vertical />
-        <q-item-section
-          ><div class="row" style="align-items: center;">
+        <q-item-section>
+          <div class="row" style="align-items: center;">
             <div class="q-mr-md">
               <div>
-                <q-spinner-radio
-                  class="q-mx-md"
-                  v-if="k.Reader === 'running'"
-                  color="primary"
-                  size="2em"
-                />
+                <q-spinner-radio class="q-mx-md" v-if="k.Reader === 'running'" color="primary" size="2em" />
               </div>
-              <q-item-label
-                ><span class="text-h6">{{ k.SubscriberId }}</span></q-item-label
-              >
-            <q-separator class="q-my-sm"  />
-            <div style="width:200px;max-width:200px;"
-             >
-              <q-item-label caption lines="1">{{
-                k.TopicPrefix + " ver (" + k.Version + ")"
-              }}</q-item-label>
-              <!-- <q-item-label caption lines="1">{{
+              <q-item-label><span class="text-h6">{{ k.StationId }}</span></q-item-label>
+              <q-separator class="q-my-sm" />
+              <div style="width:200px;max-width:200px;">
+                <q-item-label caption lines="1">{{
+                                  k.TopicPrefix + " ver (" + k.Version + ")"
+                                  }}</q-item-label>
+                <!-- <q-item-label caption lines="1">{{
                 k.version
               }}</q-item-label> -->
-            <q-separator class="q-my-sm"  />
-              <q-item-label caption lines="3">{{
-                k.SubscriberInfo
-              }}</q-item-label>
-            </div>
+                <q-separator class="q-my-sm" />
+                <q-item-label caption lines="3">{{
+                                  k.StationInfo
+                                  }}</q-item-label>
+              </div>
             </div>
             <!-- <q-separator class="q-ml-md" vertical /> -->
             <div>
-              <q-img
-                style="max-width: 250px; height: 150px; min-width: 250px"
-                fit="scale-down"
-                no-transition
-                :src="previews[k.SubscriberId]"
-
-              >
+              <q-img style="max-width: 250px; height: 150px; min-width: 250px" fit="scale-down" no-transition
+                :src="previews[k.StationId]">
                 <template v-slot:error>
-                  <div
-                    class="absolute-full flex flex-center"
-                    style="background-color: rgb(184, 50, 50)"
-                  >
+                  <div class="absolute-full flex flex-center" style="background-color: rgb(184, 50, 50)">
                     Preview not available
                   </div>
                 </template>
@@ -104,39 +66,19 @@
 
 
             <div class="column" v-for="i in getSkeletonCount(k)" :key="i">
-              <img
-                style="max-width: 60px; height: 50px"
-                src="~assets/stickman.png"
-              />
+              <img style="max-width: 60px; height: 50px" src="~assets/stickman.png" />
             </div>
           </div>
         </q-item-section>
 
         <q-item-section side>
           <div class="row">
-            <q-btn
-              flat
-              round
-              :icon="getIconFromActivity(k.Reader)"
-              @click="toggle(k)"
-              size="1.5em"
-            >
+            <q-btn flat round :icon="getIconFromActivity(k.Reader)" @click="toggle(k)" size="1.5em">
             </q-btn>
             <!--:color="getColorFromPreview(k)"-->
-            <q-btn
-              flat
-              round
-              icon="camera"
-
-              @click="takeSnapshot(k)"
-              size="1.5em"
-            ></q-btn>
-            <q-toggle
-            :disable="k.reader=='running'"
-              :modelValue="getSaveAvi(k)"
-              @update:modelValue="toggleSaveAvi(k)"
-              label="AVI"
-            />
+            <q-btn flat round icon="camera" @click="takeSnapshot(k)" size="1.5em"></q-btn>
+            <q-toggle :disable="k.reader=='running'" :modelValue="getSaveAvi(k)" @update:modelValue="toggleSaveAvi(k)"
+              label="AVI" />
           </div>
         </q-item-section>
       </q-item>
@@ -190,7 +132,7 @@ export default defineComponent({
         command += "-1"
       else
         command += "1000"
-      mqtt.publish(kinect.TopicPrefix + '/'  + kinect.SubscriberId + '/ctrl', command)
+      mqtt.publish(kinect.TopicPrefix + '/'  + kinect.StationId + '/ctrl', command)
 
     }
     function getColorFromPreview(kinect) {
@@ -238,7 +180,7 @@ export default defineComponent({
         case 'status':
           // ignore my own message
           const payload = JSON.parse(message.payloadString)
-          kinects[payload.SubscriberId] = payload
+          kinects[payload.StationId] = payload
           break
         case 'snapshot':
           let base64String = ''
@@ -265,14 +207,15 @@ export default defineComponent({
           kinects[publisher].skeletons = Math.max(
             ...ooo.map((x) => x['S'].length)
           )
-          kinects[publisher].lastSampleTime = Date.now(); //Date.parse(ooo[ooo.length - 1].ST)
-          setTimeout(() => {
-            console.log(getSecondsDiff(Date.now(), kinects[publisher].lastSampleTime ))
-            if (getSecondsDiff(Date.now(), kinects[publisher].lastSampleTime )> 1) {
-              console.log('too late, resetting')
-              kinects[publisher].skeletons = 0
-            }
-          }, 3000)
+          //console.log('skeletons in sample: ', kinects[publisher].skeletons)
+          // kinects[publisher].lastSampleTime = Date.now(); //Date.parse(ooo[ooo.length - 1].ST)
+          // setTimeout(() => {
+          //   console.log(getSecondsDiff(Date.now(), kinects[publisher].lastSampleTime ))
+          //   if (getSecondsDiff(Date.now(), kinects[publisher].lastSampleTime )> 1) {
+          //     console.log('too late, resetting')
+          //     kinects[publisher].skeletons = 0
+          //   }
+          // }, 3000)
           //}
           break
       }
@@ -286,7 +229,7 @@ export default defineComponent({
       let command = 'stop'
       if (kinect.Reader !== 'running')
         command = 'start:' + new Date().toISOString().replaceAll(':', '.') //+ uuidv4()
-      mqtt.publish(kinect.TopicPrefix + '/' + kinect.SubscriberId + '/ctrl', command)
+      mqtt.publish(kinect.TopicPrefix + '/' + kinect.StationId + '/ctrl', command)
     }
     /*
           // togglePreview(kinect)
@@ -295,17 +238,17 @@ export default defineComponent({
         command += "-1"
       else
         command += "1000"
-      mqtt.publish('kv2/' + kinect.subscriberId + '/ctrl', command)
+      mqtt.publish('kv2/' + kinect.stationId + '/ctrl', command)
 
     */
     function takeSnapshot(kinect) {
 
       // if (kinect.preview) {
       let command = 'snapshot'
-      mqtt.publish(kinect.TopicPrefix + '/'  + kinect.SubscriberId + '/ctrl', command)
+      mqtt.publish(kinect.TopicPrefix + '/'  + kinect.StationId + '/ctrl', command)
       //   //if (kinect.reader === 'running')
       //   kinect.previewInterval = setInterval(()=>{
-      //     mqtt.publish('kv2/' + kinect.subscriberId + '/ctrl', command)}, 1000)
+      //     mqtt.publish('kv2/' + kinect.stationId + '/ctrl', command)}, 1000)
       // } else {
       //   clearInterval(kinect.previewInterval)
       // }
@@ -314,7 +257,7 @@ export default defineComponent({
     function disconnectStation(kinect) {
       // if (kinect.version == 'k4a')
 
-      mqtt.publish(kinect.TopicPrefix + '/'  + kinect.SubscriberId + '/ctrl', 'quit')
+      mqtt.publish(kinect.TopicPrefix + '/'  + kinect.StationId + '/ctrl', 'quit')
       setTimeout(pingStatus, 3000)
     }
     function startAll() {
