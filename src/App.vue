@@ -11,7 +11,7 @@ export default defineComponent({
   setup() {
     // const mqtt = new MQTTWSService('localhost', 9001, 'clientJS')
     const mqtt = new MQTTWSService('localhost', 8883, 'clientJS')
-    mqtt.connect()
+    // let the dashboard page connect mqtt.connect()
     provide('mqtt', mqtt)
   },
 })

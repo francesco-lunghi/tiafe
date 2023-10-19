@@ -5,19 +5,18 @@ class MQTTWSService {
     this.host = host
     this.port = port
     this.clientID = clientID
-    this.client = {}
-
+    this.client = null
   }
 
 
-  connect() {
+  connect(onMessageArrived) {
     // client = new Paho.MQTT.Client('test.mosquitto.org', 8081, 'clientJS')
     // client = new Paho.MQTT.Client('theseed', 8883, 'clientJS')
     this.client = new Paho.MQTT.Client(this.host, this.port, this.clientID)
 
     // set callback handlers
     this.client.onConnectionLost = this.onConnectionLost
-    this.client.onMessageArrived = this.onMessageArrived
+    this.client.onMessageArrived = onMessageArrived
 
     // connect the client
     this.client.connect({
@@ -31,7 +30,14 @@ class MQTTWSService {
   }
   onFailure(message) {
     console.log(message)
+    alert('MQTT Fail to connect')
     //setTimeout(connect, 2000)
+  }
+  isConnected() {
+    if (this.client)
+      return this.client.isConnected()
+    else
+      return false
   }
   // called when the client connects
   onConnect(context) {
@@ -52,6 +58,7 @@ class MQTTWSService {
   // called when the client loses its connection
   onConnectionLost(responseObject) {
     if (responseObject.errorCode !== 0) {
+      alert('onConnectionLost:' + responseObject.errorMessage)
       console.log('onConnectionLost:' + responseObject.errorMessage)
     }
   }

@@ -100,12 +100,17 @@ export default defineComponent({
     const previews = reactive({})
 
     onMounted(() => {
-      connect()
+      if (!mqtt.isConnected())
+        mqtt.connect(onMessageArrived)
+      else {
+        subscribe()
+        pingStatus()
+      }
     })
     function updateSkeleton(k) {
       kinects[k].skeletons = 0
     }
-    function connect() {
+    function subscribe() {
       mqtt.setOnMessageArrived(onMessageArrived)
     }
     function getColorFromStatus(status) {
