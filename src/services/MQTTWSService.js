@@ -30,7 +30,7 @@ class MQTTWSService {
   }
   onFailure(message) {
     console.log(message)
-    alert('MQTT Fail to connect')
+    alert('MQTT Failed to connect')
     //setTimeout(connect, 2000)
   }
   isConnected() {

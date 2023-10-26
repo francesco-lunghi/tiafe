@@ -118,18 +118,6 @@ export default defineComponent({
           format: val => `${val}`,
           sortable: true
         },
-        // {
-        //   name: 'name',
-        //   required: true,
-        //   label: 'Dessert (100g serving)',
-        //   align: 'left',
-        //   field: row => row.name,
-        //   format: val => `${val}`,
-        //   sortable: true
-        // },
-        // { name: 'calories', align: 'center', label: 'Calories', field: 'calories', sortable: true },
-        // { name: 'calcium', label: 'Calcium (%)', field: 'calcium', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
-        // { name: 'iron', label: 'Iron (%)', field: 'iron', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
         { name: 'action', label: 'Action', field: 'action' }
       ]
     )

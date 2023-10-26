@@ -41,15 +41,15 @@
               <q-separator class="q-my-sm" />
               <div style="width:200px;max-width:200px;">
                 <q-item-label caption lines="1">{{
-                                  k.TopicPrefix + " ver (" + k.Version + ")"
-                                  }}</q-item-label>
+                  k.TopicPrefix + " ver (" + k.Version + ")"
+                }}</q-item-label>
                 <!-- <q-item-label caption lines="1">{{
                 k.version
               }}</q-item-label> -->
                 <q-separator class="q-my-sm" />
                 <q-item-label caption lines="3">{{
-                                  k.StationInfo
-                                  }}</q-item-label>
+                  k.StationInfo
+                }}</q-item-label>
               </div>
             </div>
             <!-- <q-separator class="q-ml-md" vertical /> -->
@@ -77,7 +77,7 @@
             </q-btn>
             <!--:color="getColorFromPreview(k)"-->
             <q-btn flat round icon="camera" @click="takeSnapshot(k)" size="1.5em"></q-btn>
-            <q-toggle :disable="k.reader=='running'" :modelValue="getSaveAvi(k)" @update:modelValue="toggleSaveAvi(k)"
+            <q-toggle :disable="k.reader == 'running'" :modelValue="getSaveAvi(k)" @update:modelValue="toggleSaveAvi(k)"
               label="AVI" />
           </div>
         </q-item-section>
@@ -88,8 +88,9 @@
 
 <script>
 //import example from 'assets/example.json'
-import { defineComponent, onMounted, ref, reactive, inject } from 'vue'
+import { defineComponent, onMounted, onBeforeUnmount, ref, reactive, inject } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
+
 
 export default defineComponent({
   name: 'DashBoardPage',
@@ -98,6 +99,7 @@ export default defineComponent({
     const mqtt = inject('mqtt')
     const kinects = reactive({})
     const previews = reactive({})
+    const refreshIntervalId = ref(null);
 
     onMounted(() => {
       if (!mqtt.isConnected())
@@ -106,9 +108,16 @@ export default defineComponent({
         subscribe()
         pingStatus()
       }
+      refreshIntervalId.value = setInterval(updateSkeletons, 2000);
     })
-    function updateSkeleton(k) {
-      kinects[k].skeletons = 0
+    onBeforeUnmount(() => {
+      clearInterval(refreshIntervalId.value);
+    })
+    function updateSkeletons() {
+      //console.log('resetting skeletons')
+      for (const [key, value] of Object.entries(kinects)) {
+        kinects[key].skeletons = 0
+      }
     }
     function subscribe() {
       mqtt.setOnMessageArrived(onMessageArrived)
@@ -124,8 +133,8 @@ export default defineComponent({
     }
     function getSaveAvi(kinect) {
       if (kinect.StreamingInterval == 1000)
-      return true
-    else return false
+        return true
+      else return false
     }
     function toggleSaveAvi(kinect) {
       // if (kinect.streamingInterval == 1000)
@@ -137,7 +146,7 @@ export default defineComponent({
         command += "-1"
       else
         command += "1000"
-      mqtt.publish(kinect.TopicPrefix + '/'  + kinect.StationId + '/ctrl', command)
+      mqtt.publish(kinect.TopicPrefix + '/' + kinect.StationId + '/ctrl', command)
 
     }
     function getColorFromPreview(kinect) {
@@ -189,11 +198,11 @@ export default defineComponent({
           break
         case 'snapshot':
           let base64String = ''
-          if (version == 'k4a'){
+          if (version == 'k4a') {
             base64String = message.payloadString
           }
           else {
-              base64String = window.btoa(
+            base64String = window.btoa(
               new Uint8Array(message.payloadBytes).reduce(function (data, byte) {
                 return data + String.fromCharCode(byte)
               }, '')
@@ -250,7 +259,7 @@ export default defineComponent({
 
       // if (kinect.preview) {
       let command = 'snapshot'
-      mqtt.publish(kinect.TopicPrefix + '/'  + kinect.StationId + '/ctrl', command)
+      mqtt.publish(kinect.TopicPrefix + '/' + kinect.StationId + '/ctrl', command)
       //   //if (kinect.reader === 'running')
       //   kinect.previewInterval = setInterval(()=>{
       //     mqtt.publish('kv2/' + kinect.stationId + '/ctrl', command)}, 1000)
@@ -262,7 +271,7 @@ export default defineComponent({
     function disconnectStation(kinect) {
       // if (kinect.version == 'k4a')
 
-      mqtt.publish(kinect.TopicPrefix + '/'  + kinect.StationId + '/ctrl', 'quit')
+      mqtt.publish(kinect.TopicPrefix + '/' + kinect.StationId + '/ctrl', 'quit')
       setTimeout(pingStatus, 3000)
     }
     function startAll() {
