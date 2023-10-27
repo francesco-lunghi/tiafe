@@ -127,11 +127,49 @@ export default defineComponent({
     const btnclick = (id, name) => {
       console.log('Button Click', id, name)
     }
+    // function getFileNameFromResponseHeaders(headers) {
+    //   const contentDisposition = headers['content-disposition'];
+    //   if (contentDisposition) {
+    //     const matches = contentDisposition.match(/filename=([^;]+)/);
+    //     if (matches) {
+    //       return matches[1];
+    //     }
+    //   }
+    //   // Se l'intestazione Content-Disposition non è presente o non contiene un nome file, puoi restituire un nome predefinito o gestire la situazione in modo appropriato.
+    //   return 'file';
+    // }
     const downloadAcquisition = (AcquisitionId) => {
       console.log("downloading acquisition " + AcquisitionId)
+      // ApiService.get('acquisitions/' + AcquisitionId + '/download_skeletons/')
+      ApiService.get('acquisitions/' + AcquisitionId + '/download_skeletons/', {
+        responseType: 'blob',
+      }).then((response) => {
+        //  const filename = getFileNameFromResponseHeaders(response.headers);
+
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', AcquisitionId + ".zip") //or any other extension
+        document.body.appendChild(link)
+        link.click()
+      })
+      //window.location.href = 'http://localhost:8000/api/v1/acquisitions/' + AcquisitionId + '/download_skeletons/'
     }
-    const downloadKinect = (AcquisitionId, stationId) => {
-      console.log("downloading acquisition " + AcquisitionId + " kinect: " + stationId)
+    const downloadKinect = (AcquisitionId, StationId) => {
+      console.log("downloading acquisition " + AcquisitionId + " kinect: " + StationId)
+      ApiService.get('acquisitions/' + AcquisitionId + '/download_skeletons/' + StationId, {
+        responseType: 'blob',
+      }).then((response) => {
+        //  const filename = getFileNameFromResponseHeaders(response.headers);
+
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', AcquisitionId + "_" + StationId + ".zip") //or any other extension
+        document.body.appendChild(link)
+        link.click()
+      })
+      // window.location.href = 'http://localhost:8000/api/v1/acquisitions/' + AcquisitionId + '/download_skeletons/' + StationId
     }
     const handleButtonClick = (value) => {
       // Do something with the clicked value
@@ -141,7 +179,6 @@ export default defineComponent({
       ApiService.get('acquisitions').then((response) => {
         //Object.assign(ponte, response.data)
         // TODO: add error checking!
-
         const r = response.data
         acquisitions.value = []
         for (let k of Object.keys(r)) {
