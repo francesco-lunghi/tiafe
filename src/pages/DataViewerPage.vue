@@ -40,14 +40,17 @@
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td auto-width>
-            <q-btn size="sm" color="blue" round dense @click="props.expand = !props.expand"
+            <q-btn size="md" color="blue" round dense @click="props.expand = !props.expand"
               :icon="props.expand ? 'remove' : 'add'" />
           </q-td>
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props" @click="props.expand = !props.expand">
             {{ col.value }}
           </q-td>
           <q-td auto-width>
-            <q-btn size="sm" color="blue" round dense @click="downloadAcquisition(props.row.AcquisitionId)"
+            <q-btn class="q-mr-md" size="md" color="blue" round dense @click="downloadAcquisition(props.row.AcquisitionId, true)"
+              icon="download"> <q-badge color="orange" rounded floating>c</q-badge>
+            </q-btn>
+            <q-btn size="md" color="blue" round dense @click="downloadAcquisition(props.row.AcquisitionId, false)"
               icon="download" />
           </q-td>
         </q-tr>
@@ -62,8 +65,13 @@
                 </q-item-section>
 
                 <q-item-section side>
-                  <q-btn @click="downloadKinect(props.row.AcquisitionId, kinect.StationId)" size="sm" color="green" round
-                    dense icon="download">
+                  <q-btn @click="downloadKinect(props.row.AcquisitionId, kinect.StationId, true)" size="md" color="green"
+                    round dense icon="download"> <q-badge color="orange" rounded floating>c</q-badge>
+                  </q-btn>
+                </q-item-section>
+                <q-item-section side>
+                  <q-btn @click="downloadKinect(props.row.AcquisitionId, kinect.StationId, false)" size="md" color="green"
+                    round dense icon="download">
                   </q-btn>
                 </q-item-section>
               </q-item>
@@ -81,7 +89,7 @@
         </q-item-section>
       </q-item>
     </q-list>
-    -->{{ acquisitions }}
+    {{ acquisitions }}-->
   </q-page>
 </template>
 
@@ -118,7 +126,7 @@ export default defineComponent({
           format: val => `${val}`,
           sortable: true
         },
-        { name: 'action', label: 'Action', field: 'action' }
+        { name: 'action', label: 'Action', field: 'action', align: 'right', },
       ]
     )
     const onRowClick = (evt, row) => {
@@ -138,10 +146,10 @@ export default defineComponent({
     //   // Se l'intestazione Content-Disposition non è presente o non contiene un nome file, puoi restituire un nome predefinito o gestire la situazione in modo appropriato.
     //   return 'file';
     // }
-    const downloadAcquisition = (AcquisitionId) => {
+    const downloadAcquisition = (AcquisitionId, calibrated) => {
       console.log("downloading acquisition " + AcquisitionId)
       // ApiService.get('acquisitions/' + AcquisitionId + '/download_skeletons/')
-      ApiService.get('acquisitions/' + AcquisitionId + '/download_skeletons/', {
+      ApiService.get('acquisitions/' + AcquisitionId + '/download_skeletons?calibrated=' + calibrated, {
         responseType: 'blob',
       }).then((response) => {
         //  const filename = getFileNameFromResponseHeaders(response.headers);
@@ -155,9 +163,9 @@ export default defineComponent({
       })
       //window.location.href = 'http://localhost:8000/api/v1/acquisitions/' + AcquisitionId + '/download_skeletons/'
     }
-    const downloadKinect = (AcquisitionId, StationId) => {
+    const downloadKinect = (AcquisitionId, StationId, calibrated) => {
       console.log("downloading acquisition " + AcquisitionId + " kinect: " + StationId)
-      ApiService.get('acquisitions/' + AcquisitionId + '/download_skeletons/' + StationId, {
+      ApiService.get('acquisitions/' + AcquisitionId + '/download_skeletons/' + StationId + '?calibrated=' + calibrated, {
         responseType: 'blob',
       }).then((response) => {
         //  const filename = getFileNameFromResponseHeaders(response.headers);

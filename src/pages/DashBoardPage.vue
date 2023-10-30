@@ -1,24 +1,24 @@
 <template>
   <q-page>
     <q-toolbar class="bg-grey-3 shadow-2">
-      <q-icon name="build_circle" size="2rem" color="blue" />
+      <q-icon name="build_circle" size="3rem" color="blue" />
       <q-item-section>
-        <div class="row">
+        <div class="row" style="align-items: center;">
           <div class="q-mx-md">
-            <q-toolbar-title>Available kinects</q-toolbar-title>
+            <q-toolbar-title style="font-size: 24px;">Available kinects</q-toolbar-title>
           </div>
           <q-separator vertical />
           <div>
-            <q-btn flat round dense icon="play_arrow" @click="startAll()" :disable="Object.keys(kinects).length === 0">
+            <q-btn size="lg" flat round dense icon="play_arrow" @click="startAll()" :disable="Object.keys(kinects).length === 0">
             </q-btn>
           </div>
           <div>
-            <q-btn flat round dense icon="stop" :disable="Object.keys(kinects).length === 0" @click="stopAll()">
+            <q-btn flat size="lg" round dense icon="stop" :disable="Object.keys(kinects).length === 0" @click="stopAll()">
             </q-btn>
           </div>
         </div>
       </q-item-section>
-      <q-btn flat round dense icon="refresh" @click="pingStatus" />
+      <q-btn flat round dense size="lg" icon="refresh" @click="pingStatus" />
     </q-toolbar>
     <q-list bordered dense>
       <q-item v-for="(k, StationId) in kinects" :key="StationId" class="q-my-sm">
