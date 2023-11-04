@@ -9,7 +9,8 @@
           </div>
           <q-separator vertical />
           <div>
-            <q-btn size="lg" flat round dense icon="play_arrow" @click="startAll()" :disable="Object.keys(kinects).length === 0">
+            <q-btn size="lg" flat round dense icon="play_arrow" @click="startAll()"
+              :disable="Object.keys(kinects).length === 0">
             </q-btn>
           </div>
           <div>
