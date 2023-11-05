@@ -47,11 +47,22 @@
             {{ col.value }}
           </q-td>
           <q-td auto-width>
-            <q-btn class="q-mr-md" size="md" color="blue" round dense @click="downloadAcquisition(props.row.AcquisitionId, true)"
-              icon="download"> <q-badge color="orange" rounded floating>c</q-badge>
+            <q-btn class="q-mr-md" size="md" color="red" round dense @click="deleteAcquisition(props.row.AcquisitionId)"
+              icon="delete"> <q-tooltip>
+                delete the acquisition
+              </q-tooltip>
+            </q-btn>
+            <q-btn class="q-mr-md" size="md" color="blue" round dense
+              @click="downloadAcquisition(props.row.AcquisitionId, true)" icon="download"> <q-badge color="orange" rounded
+                floating>c</q-badge><q-tooltip>
+                donwload acquisition<br>(calibrated)
+              </q-tooltip>
             </q-btn>
             <q-btn size="md" color="blue" round dense @click="downloadAcquisition(props.row.AcquisitionId, false)"
-              icon="download" />
+              icon="download" ><q-tooltip>
+                donwload acquisition<br>(raw)
+              </q-tooltip>
+            </q-btn>
           </q-td>
         </q-tr>
         <q-tr v-show="props.expand" :props="props">
@@ -66,12 +77,16 @@
 
                 <q-item-section side>
                   <q-btn @click="downloadKinect(props.row.AcquisitionId, kinect.StationId, true)" size="md" color="green"
-                    round dense icon="download"> <q-badge color="orange" rounded floating>c</q-badge>
+                    round dense icon="download"> <q-badge color="orange" rounded floating>c</q-badge><q-tooltip>
+                donwload station data<br>(calibrated)
+              </q-tooltip>
                   </q-btn>
                 </q-item-section>
                 <q-item-section side>
                   <q-btn @click="downloadKinect(props.row.AcquisitionId, kinect.StationId, false)" size="md" color="green"
-                    round dense icon="download">
+                    round dense icon="download"><q-tooltip>
+                donwload station data<br>(raw)
+              </q-tooltip>
                   </q-btn>
                 </q-item-section>
               </q-item>
@@ -163,6 +178,16 @@ export default defineComponent({
       })
       //window.location.href = 'http://localhost:8000/api/v1/acquisitions/' + AcquisitionId + '/download_skeletons/'
     }
+    const deleteAcquisition = (AcquisitionId) => {
+      if (window.confirm("Do you really want to delete this acquisition?")) {
+        ApiService.delete('acquisitions/' + AcquisitionId).then((response) => {
+          console.log("Acquisition deleted")
+        })
+        refreshAcquisitions()
+      }
+
+    }
+
     const downloadKinect = (AcquisitionId, StationId, calibrated) => {
       console.log("downloading acquisition " + AcquisitionId + " kinect: " + StationId)
       ApiService.get('acquisitions/' + AcquisitionId + '/download_skeletons/' + StationId + '?calibrated=' + calibrated, {
@@ -184,6 +209,10 @@ export default defineComponent({
       console.log(`Button clicked with value: ${value}`);
     }
     onMounted(() => {
+      refreshAcquisitions()
+    })
+    function refreshAcquisitions() {
+
       ApiService.get('acquisitions').then((response) => {
         //Object.assign(ponte, response.data)
         // TODO: add error checking!
@@ -197,7 +226,7 @@ export default defineComponent({
         .catch((e) => {
           router.push('/403')
         })
-    })
+    }
 
     return {
       acquisitions,
@@ -206,6 +235,7 @@ export default defineComponent({
       btnclick,
       handleButtonClick,
       downloadAcquisition,
+      deleteAcquisition,
       downloadKinect,
       filter: ref('')
 

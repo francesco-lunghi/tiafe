@@ -40,36 +40,39 @@
               </div>
               <q-item-label><span class="text-h6">{{ k.StationId }}</span></q-item-label>
               <q-separator class="q-my-sm" />
-              <div style="width:200px;max-width:200px;">
+              <div class="column" style="width:200px;max-width:200px;">
                 <q-item-label caption lines="1">{{
                   k.TopicPrefix + " ver (" + k.Version + ")"
                 }}</q-item-label>
                 <!-- <q-item-label caption lines="1">{{
                 k.version
-              }}</q-item-label> -->
+                }}</q-item-label> -->
                 <q-separator class="q-my-sm" />
                 <q-item-label caption lines="3">{{
                   k.StationInfo
                 }}</q-item-label>
+                <q-col class="row"><q-input class="q-mr-md" style="flex:1" type="number" min="1" max="30" dense round v-model="k.SamplingRate"
+                    label="Sampling Rate [Hz]"></q-input><q-btn @click="setSamplingRate(k)">set</q-btn>
+                </q-col>
+              </div>
+              </div>
+              <!-- <q-separator class="q-ml-md" vertical /> -->
+              <div>
+                <q-img style="max-width: 250px; height: 150px; min-width: 250px" fit="scale-down" no-transition
+                  :src="previews[k.StationId]">
+                  <template v-slot:error>
+                    <div class="absolute-full flex flex-center" style="background-color: rgb(184, 50, 50)">
+                      Preview not available
+                    </div>
+                  </template>
+                </q-img>
+              </div>
+
+
+              <div class="column" v-for="i in getSkeletonCount(k)" :key="i">
+                <img style="max-width: 60px; height: 50px" src="~assets/stickman.png" />
               </div>
             </div>
-            <!-- <q-separator class="q-ml-md" vertical /> -->
-            <div>
-              <q-img style="max-width: 250px; height: 150px; min-width: 250px" fit="scale-down" no-transition
-                :src="previews[k.StationId]">
-                <template v-slot:error>
-                  <div class="absolute-full flex flex-center" style="background-color: rgb(184, 50, 50)">
-                    Preview not available
-                  </div>
-                </template>
-              </q-img>
-            </div>
-
-
-            <div class="column" v-for="i in getSkeletonCount(k)" :key="i">
-              <img style="max-width: 60px; height: 50px" src="~assets/stickman.png" />
-            </div>
-          </div>
         </q-item-section>
 
         <q-item-section side>
@@ -269,6 +272,10 @@ export default defineComponent({
       // }
 
     }
+    function setSamplingRate(kinect) {
+      let command = 'samplingrate:' + kinect.SamplingRate
+      mqtt.publish(kinect.TopicPrefix + '/' + kinect.StationId + '/ctrl', command)
+    }
     function disconnectStation(kinect) {
       // if (kinect.version == 'k4a')
 
@@ -316,6 +323,7 @@ export default defineComponent({
       stopAll,
       getSkeletonCount,
       getSaveAvi,
+      setSamplingRate,
       toggleSaveAvi,
       disconnectStation
     }
