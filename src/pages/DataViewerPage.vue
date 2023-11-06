@@ -20,6 +20,10 @@
     </q-toolbar> -->
 
     <q-table title="Acquisitions" :rows="acquisitions" :columns="columns" row-key="AcquisitionId" :filter="filter">
+      <template v-slot:top-left>
+        <q-btn icon="refresh" size="md"  round dense @click="refreshAcquisitions"/>
+        <q-label class="q-ml-md">Acquisitions</q-label>
+      </template>
       <template v-slot:top-right>
         <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
           <template v-slot:append>
@@ -59,7 +63,7 @@
               </q-tooltip>
             </q-btn>
             <q-btn size="md" color="blue" round dense @click="downloadAcquisition(props.row.AcquisitionId, false)"
-              icon="download" ><q-tooltip>
+              icon="download"><q-tooltip>
                 donwload acquisition<br>(raw)
               </q-tooltip>
             </q-btn>
@@ -78,15 +82,15 @@
                 <q-item-section side>
                   <q-btn @click="downloadKinect(props.row.AcquisitionId, kinect.StationId, true)" size="md" color="green"
                     round dense icon="download"> <q-badge color="orange" rounded floating>c</q-badge><q-tooltip>
-                donwload station data<br>(calibrated)
-              </q-tooltip>
+                      donwload station data<br>(calibrated)
+                    </q-tooltip>
                   </q-btn>
                 </q-item-section>
                 <q-item-section side>
                   <q-btn @click="downloadKinect(props.row.AcquisitionId, kinect.StationId, false)" size="md" color="green"
                     round dense icon="download"><q-tooltip>
-                donwload station data<br>(raw)
-              </q-tooltip>
+                      donwload station data<br>(raw)
+                    </q-tooltip>
                   </q-btn>
                 </q-item-section>
               </q-item>
@@ -182,8 +186,10 @@ export default defineComponent({
       if (window.confirm("Do you really want to delete this acquisition?")) {
         ApiService.delete('acquisitions/' + AcquisitionId).then((response) => {
           console.log("Acquisition deleted")
-        })
-        refreshAcquisitions()
+
+        }).finally(()=>{
+          refreshAcquisitions()})
+
       }
 
     }
@@ -213,6 +219,7 @@ export default defineComponent({
     })
     function refreshAcquisitions() {
 
+      console.log("refreshing acquisitions")
       ApiService.get('acquisitions').then((response) => {
         //Object.assign(ponte, response.data)
         // TODO: add error checking!
@@ -234,7 +241,7 @@ export default defineComponent({
       onRowClick,
       btnclick,
       handleButtonClick,
-      downloadAcquisition,
+      downloadAcquisition,refreshAcquisitions,
       deleteAcquisition,
       downloadKinect,
       filter: ref('')
