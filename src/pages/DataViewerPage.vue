@@ -22,7 +22,7 @@
     <q-table title="Acquisitions" :rows="acquisitions" :columns="columns" row-key="AcquisitionId" :filter="filter">
       <template v-slot:top-left>
         <q-btn icon="refresh" size="md"  round dense @click="refreshAcquisitions"/>
-        <q-label class="q-ml-md">Acquisitions</q-label>
+        <!-- <q-btn class="q-ml-md">Acquisitions</q-btn> -->
       </template>
       <template v-slot:top-right>
         <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">

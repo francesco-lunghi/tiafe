@@ -51,28 +51,31 @@
                 <q-item-label caption lines="3">{{
                   k.StationInfo
                 }}</q-item-label>
-                <q-col class="row"><q-input class="q-mr-md" style="flex:1" type="number" min="1" max="30" dense round v-model="k.SamplingRate"
-                    label="Sampling Rate [Hz]"></q-input><q-btn @click="setSamplingRate(k)">set</q-btn>
-                </q-col>
-              </div>
-              </div>
-              <!-- <q-separator class="q-ml-md" vertical /> -->
-              <div>
-                <q-img style="max-width: 250px; height: 150px; min-width: 250px" fit="scale-down" no-transition
-                  :src="previews[k.StationId]">
-                  <template v-slot:error>
-                    <div class="absolute-full flex flex-center" style="background-color: rgb(184, 50, 50)">
-                      Preview not available
-                    </div>
-                  </template>
-                </q-img>
-              </div>
+                <div class="row"><q-input class="q-mr-md" style="flex:1" type="number" min="1" max="30" dense round
+                    v-model="k.SamplingRate" label="Sampling Rate [Hz]"></q-input><q-btn @click="getConfig(k)">set</q-btn>
+                </div>
+                <div class="row"><q-btn @click="getConfig(k)">config</q-btn>
+                </div>
 
-
-              <div class="column" v-for="i in getSkeletonCount(k)" :key="i">
-                <img style="max-width: 60px; height: 50px" src="~assets/stickman.png" />
               </div>
             </div>
+            <!-- <q-separator class="q-ml-md" vertical /> -->
+            <div>
+              <q-img style="max-width: 250px; height: 150px; min-width: 250px" fit="scale-down" no-transition
+                :src="previews[k.StationId]">
+                <template v-slot:error>
+                  <div class="absolute-full flex flex-center" style="background-color: rgb(184, 50, 50)">
+                    Preview not available
+                  </div>
+                </template>
+              </q-img>
+            </div>
+
+
+            <div class="column" v-for="i in getSkeletonCount(k)" :key="i">
+              <img style="max-width: 60px; height: 50px" src="~assets/stickman.png" />
+            </div>
+          </div>
         </q-item-section>
 
         <q-item-section side>
@@ -88,6 +91,22 @@
       </q-item>
     </q-list>
   </q-page>
+  <q-dialog v-model="config" persistent>
+    <q-card style="min-width: 350px">
+      <q-card-section>
+        <div class="text-h6">Configuration</div>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none">
+        <q-input dense v-model="configuration['config']['stationInfo']" autofocus @keyup.enter="config = false" />
+      </q-card-section>
+
+      <q-card-actions align="right" class="text-primary">
+        <q-btn flat label="Cancel" v-close-popup />
+        <q-btn flat label="Upload" @click="uploadConfiguration()" v-close-popup />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script>
@@ -102,6 +121,8 @@ export default defineComponent({
   setup() {
     const mqtt = inject('mqtt')
     const kinects = reactive({})
+    const config = ref(false);
+    const configuration = reactive({})
     const previews = reactive({})
     const refreshIntervalId = ref(null);
 
@@ -195,6 +216,13 @@ export default defineComponent({
       const publisher = topic.pop()
       const version = topic.pop()
       switch (type) {
+        case 'config':
+          // ignore my own message
+          configuration["config"] = JSON.parse(message.payloadString)
+          configuration["topicPrefix"] = version
+          configuration["stationId"] = publisher
+          config.value = true
+          break
         case 'status':
           // ignore my own message
           const payload = JSON.parse(message.payloadString)
@@ -243,6 +271,11 @@ export default defineComponent({
       mqtt.publish('kv2/all/ctrl', 'status')
       mqtt.publish('k4a/all/ctrl', 'status')
     }
+    function uploadConfiguration() {
+
+      let command = 'setconfig'
+      //mqtt.publish(kinect.TopicPrefix + '/' + kinect.StationId + '/ctrl', command)
+    }
     function toggle(kinect) {
       let command = 'stop'
       if (kinect.Reader !== 'running')
@@ -274,6 +307,10 @@ export default defineComponent({
     }
     function setSamplingRate(kinect) {
       let command = 'samplingrate:' + kinect.SamplingRate
+      mqtt.publish(kinect.TopicPrefix + '/' + kinect.StationId + '/ctrl', command)
+    }
+    function getConfig(kinect) {
+      let command = 'getconfig'// + kinect.SamplingRate
       mqtt.publish(kinect.TopicPrefix + '/' + kinect.StationId + '/ctrl', command)
     }
     function disconnectStation(kinect) {
@@ -324,8 +361,12 @@ export default defineComponent({
       getSkeletonCount,
       getSaveAvi,
       setSamplingRate,
+      getConfig,
       toggleSaveAvi,
-      disconnectStation
+      disconnectStation,
+      config,
+      configuration,
+      uploadConfiguration
     }
   },
 })
