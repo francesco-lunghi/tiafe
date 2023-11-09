@@ -91,14 +91,31 @@
       </q-item>
     </q-list>
   </q-page>
-  <q-dialog v-model="config" persistent>
+  <q-dialog v-model="config_dialog_kv2" persistent>
     <q-card style="min-width: 350px">
       <q-card-section>
-        <div class="text-h6">Configuration</div>
+        <div class="text-h6">Configuration Kv2</div>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="configuration['config']['stationInfo']" autofocus @keyup.enter="config = false" />
+        <q-input dense v-model="configuration['config']['stationInfo']" autofocus />
+        <!-- @keyup.enter="config_dialog = false" /> -->
+      </q-card-section>
+
+      <q-card-actions align="right" class="text-primary">
+        <q-btn flat label="Cancel" v-close-popup />
+        <q-btn flat label="Upload" @click="uploadConfiguration()" v-close-popup />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+   <q-dialog v-model="config_dialog_k4a" persistent>
+    <q-card style="min-width: 350px">
+      <q-card-section>
+        <div class="text-h6">Configuration K4A</div>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none">
+        <q-input dense v-model="configuration['config']['TIAK4A_STATION_INFO']" autofocus />
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
@@ -121,7 +138,8 @@ export default defineComponent({
   setup() {
     const mqtt = inject('mqtt')
     const kinects = reactive({})
-    const config = ref(false);
+    const config_dialog_kv2 = ref(false);
+    const config_dialog_k4a = ref(false);
     const configuration = reactive({})
     const previews = reactive({})
     const refreshIntervalId = ref(null);
@@ -221,7 +239,10 @@ export default defineComponent({
           configuration["config"] = JSON.parse(message.payloadString)
           configuration["topicPrefix"] = version
           configuration["stationId"] = publisher
-          config.value = true
+          if (version == 'kv2')
+            config_dialog_kv2.value = true
+          else if (version == 'k4a')
+            config_dialog_k4a.value = true
           break
         case 'status':
           // ignore my own message
@@ -273,8 +294,7 @@ export default defineComponent({
     }
     function uploadConfiguration() {
 
-      let command = 'setconfig'
-      //mqtt.publish(kinect.TopicPrefix + '/' + kinect.StationId + '/ctrl', command)
+      mqtt.publish(configuration["topicPrefix"] + '/' + configuration["stationId"] + '/ctrl', 'setconfig:' + JSON.stringify(configuration["config"]))
     }
     function toggle(kinect) {
       let command = 'stop'
@@ -364,7 +384,8 @@ export default defineComponent({
       getConfig,
       toggleSaveAvi,
       disconnectStation,
-      config,
+      config_dialog_k4a,
+      config_dialog_kv2,
       configuration,
       uploadConfiguration
     }
