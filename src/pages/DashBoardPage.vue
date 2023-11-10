@@ -52,7 +52,8 @@
                   k.StationInfo
                 }}</q-item-label>
                 <div class="row"><q-input class="q-mr-md" style="flex:1" type="number" min="1" max="30" dense round
-                    v-model="k.SamplingRate" label="Sampling Rate [Hz]"></q-input><q-btn @click="getConfig(k)">set</q-btn>
+                    v-model="k.SamplingRate" label="Sampling Rate [Hz]"></q-input><q-btn
+                    @click="setSamplingRate(k)">set</q-btn>
                 </div>
                 <div class="row"><q-btn @click="getConfig(k)">config</q-btn>
                 </div>
@@ -108,14 +109,54 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
-   <q-dialog v-model="config_dialog_k4a" persistent>
+  <q-dialog v-model="config_dialog_k4a" persistent>
     <q-card style="min-width: 350px">
       <q-card-section>
         <div class="text-h6">Configuration K4A</div>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="configuration['config']['TIAK4A_STATION_INFO']" autofocus />
+        <q-input label="Station ID" v-model="configuration['config']['TIAK4A_STATION_ID']" autofocus />
+        <q-input label="Station INFO" v-model="configuration['config']['TIAK4A_STATION_INFO']" />
+        <q-input label="Device Index" v-model.number="configuration['config']['K4A_INDEX']" />
+        <q-input label="Send Interval" v-model.number="configuration['config']['MQTT_SEND_INTERVAL']" type="number"
+          min="0.5" />
+        <q-input label="Sampling Rate" v-model.number="configuration['config']['K4A_SAMPLING_RATE']" type="number" min="1"
+          max="30" />
+        <q-select label="Color Resolution" v-model.number="configuration['config']['K4A_COLOR_RESOLUTION']"
+          :options="deviceColorResolution" />
+        <q-select label="Depth Mode" v-model="configuration['config']['K4A_DEPTH_MODE']"
+          :options="depthModeOptions" />
+        <q-input label="Remote Output Folder" v-model="configuration['config']['K4A_OUTPUT_FOLDER']" />
+        <q-select label="Device FPS" v-model="configuration['config']['K4A_KINECT_FPS']"
+          :options="deviceFPSOptions" />
+        <q-input label="Streaming Interval" v-model.number="configuration['config']['K4A_STREAM_INTERVAL']"
+          type="number" />
+        <q-input label="Thumbnails Scale Factor" v-model.number="configuration['config']['K4A_THUMBNAIL_SCALE_FACTOR']"
+          type="number" />
+        <q-toggle label="Send All Frames" v-model="configuration['config']['K4A_SEND_ALL_FRAMES']" />
+
+
+
+        <!-- "TIAK4A_STATION_ID": "k4a_station1",
+    "TIAK4A_STATION_INFO": "sul tavolo",
+    "TIAK4A_LOG_LEVEL": "INFO",
+    "MQTT_HOST": "localhost",
+    "MQTT_HOST_LIVINGLAB": "192.168.1.149",
+    "MQTT_PORT": 1883,
+    "K4A_INDEX": 0,
+    "MQTT_TOPIC_PREFIX": "k4a",
+    "MQTT_SEND_INTERVAL": 2,
+    "K4A_SAMPLING_RATE": 30,
+    "K4A_COLOR_RESOLUTION": 720,
+    "K4A_DEPTH_MODE": "WFOV_2X2BINNED",
+    "K4A_OUTPUT_FOLDER":"./img",
+    "K4A_KINECT_FPS": 30,
+    "K4A_SEND_ALL_FRAMES": false,
+    "K4A_STREAM_INTERVAL": -1,
+    "K4A_THUMBNAIL_SCALE_FACTOR": 0.2,
+    "K4A_VERSION": "4.0" -->
+
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
@@ -143,6 +184,11 @@ export default defineComponent({
     const configuration = reactive({})
     const previews = reactive({})
     const refreshIntervalId = ref(null);
+    const separator = "|"
+    const depthModeOptions = ["NFOV_2X2BINNED", "NFOV_UNBINNED", "WFOV_2X2BINNED", "WFOV_UNBINNED", "PASSIVE_IR"]
+    const deviceFPSOptions = [5, 15, 30]
+    const deviceColorResolution = [720, 1080]
+
 
     onMounted(() => {
       if (!mqtt.isConnected())
@@ -184,7 +230,7 @@ export default defineComponent({
       //   kinect.streamingInterval = -1
       // else
       //   kinect.streamingInterval = 1000
-      let command = "stream:"
+      let command = "stream" + separator
       if (kinect.StreamingInterval != -1)
         command += "-1"
       else
@@ -294,12 +340,12 @@ export default defineComponent({
     }
     function uploadConfiguration() {
 
-      mqtt.publish(configuration["topicPrefix"] + '/' + configuration["stationId"] + '/ctrl', 'setconfig:' + JSON.stringify(configuration["config"]))
+      mqtt.publish(configuration["topicPrefix"] + '/' + configuration["stationId"] + '/ctrl', 'setconfig' + separator + JSON.stringify(configuration["config"]))
     }
     function toggle(kinect) {
       let command = 'stop'
       if (kinect.Reader !== 'running')
-        command = 'start:' + new Date().toISOString().replaceAll(':', '.') //+ uuidv4()
+        command = 'start' + separator + new Date().toISOString()//.replaceAll(':', '.') //+ uuidv4()
       mqtt.publish(kinect.TopicPrefix + '/' + kinect.StationId + '/ctrl', command)
     }
     /*
@@ -326,7 +372,7 @@ export default defineComponent({
 
     }
     function setSamplingRate(kinect) {
-      let command = 'samplingrate:' + kinect.SamplingRate
+      let command = 'samplingrate' + separator + kinect.SamplingRate
       mqtt.publish(kinect.TopicPrefix + '/' + kinect.StationId + '/ctrl', command)
     }
     function getConfig(kinect) {
@@ -340,14 +386,14 @@ export default defineComponent({
       setTimeout(pingStatus, 3000)
     }
     function startAll() {
-      const acqId = new Date().toISOString().replaceAll(':', '.')
+      const acqId = new Date().toISOString()//.replaceAll(':', '.')
       mqtt.publish(
         'kv2/all/ctrl',
-        'start:' + acqId
+        'start' + separator + acqId
       )
       mqtt.publish(
         'k4a/all/ctrl',
-        'start:' + acqId
+        'start' + separator + acqId
       )
     }
     function stopAll() {
@@ -387,6 +433,9 @@ export default defineComponent({
       config_dialog_k4a,
       config_dialog_kv2,
       configuration,
+      depthModeOptions,
+      deviceFPSOptions,
+      deviceColorResolution,
       uploadConfiguration
     }
   },
