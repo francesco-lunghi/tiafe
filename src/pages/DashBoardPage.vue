@@ -37,6 +37,7 @@
             <div class="q-mr-md">
               <div>
                 <q-spinner-radio class="q-mx-md" v-if="k.Reader === 'running'" color="primary" size="2em" />
+                <q-spinner-puff class="q-mx-md" v-if="k.Reader === 'running' && k.SaveAVIStream" color="red" size="3em" />
               </div>
               <q-item-label><span class="text-h6">{{ k.StationId }}</span></q-item-label>
               <q-separator class="q-my-sm" />
@@ -51,12 +52,10 @@
                 <q-item-label caption lines="3">{{
                   k.StationInfo
                 }}</q-item-label>
-                <div class="row"><q-input class="q-mr-md" style="flex:1" type="number" min="1" max="30" dense round
+                <!-- <div class="row"><q-input class="q-mr-md" style="flex:1" type="number" min="1" max="30" dense round
                     v-model="k.SamplingRate" label="Sampling Rate [Hz]"></q-input><q-btn
                     @click="setSamplingRate(k)">set</q-btn>
-                </div>
-                <div class="row"><q-btn @click="getConfig(k)">config</q-btn>
-                </div>
+                </div> -->
 
               </div>
             </div>
@@ -82,11 +81,15 @@
         <q-item-section side>
           <div class="row">
             <q-btn flat round :icon="getIconFromActivity(k.Reader)" @click="toggle(k)" size="1.5em">
+              <q-tooltip>Start/Stop</q-tooltip>
             </q-btn>
             <!--:color="getColorFromPreview(k)"-->
-            <q-btn flat round icon="camera" @click="takeSnapshot(k)" size="1.5em"></q-btn>
-            <q-toggle :disable="k.reader == 'running'" :modelValue="getSaveAvi(k)" @update:modelValue="toggleSaveAvi(k)"
-              label="AVI" />
+            <q-btn flat round icon="camera" @click="takeSnapshot(k)" size="1.5em">
+              <q-tooltip>Snapshot</q-tooltip></q-btn>
+            <!-- <q-toggle :disable="k.reader == 'running'" :modelValue="getSaveAvi(k)" @update:modelValue="toggleSaveAvi(k)"
+              label="AVI" /> -->
+            <q-btn flat icon="settings" @click="getConfig(k)" size="1.5em"><q-tooltip>Config</q-tooltip></q-btn>
+
           </div>
         </q-item-section>
       </q-item>
@@ -99,7 +102,16 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input dense v-model="configuration['config']['stationInfo']" autofocus />
+        <q-input label="Station ID" v-model="configuration['config']['stationId']" autofocus />
+        <q-input label="Station INFO" v-model="configuration['config']['stationInfo']" />
+        <q-input label="Chunk Size (samples)" v-model.number="configuration['config']['chunkSize']" />
+        <q-input label="Sampling Rate [Hz]" v-model.number="configuration['config']['desiredSamplingRate']" type="number" min="1"/>
+        <q-toggle label="Interpolate" v-model="configuration['config']['isInterpolated']" />
+        <q-input label="Maximum Interpolation Interval [ms]" v-model.number="configuration['config']['maxInterpolationIntervalMS']" min="0"/>
+        <q-toggle label="Save AVI Stream" v-model="configuration['config']['saveAVIStream']" />
+        <q-input label="Streaming Interval [ms]" v-model.number="configuration['config']['streamingIntervalMS']" min="100"/>
+        <q-input label="Thumbnails Percentage" v-model.number="configuration['config']['thumbnailsPercent']"  min="5" step="5" max="100"
+          type="number" />
         <!-- @keyup.enter="config_dialog = false" /> -->
       </q-card-section>
 
@@ -119,18 +131,16 @@
         <q-input label="Station ID" v-model="configuration['config']['TIAK4A_STATION_ID']" autofocus />
         <q-input label="Station INFO" v-model="configuration['config']['TIAK4A_STATION_INFO']" />
         <q-input label="Device Index" v-model.number="configuration['config']['K4A_INDEX']" />
-        <q-input label="Send Interval" v-model.number="configuration['config']['MQTT_SEND_INTERVAL']" type="number"
+        <q-input label="Send Interval [s]" v-model.number="configuration['config']['MQTT_SEND_INTERVAL']" type="number"
           min="0.5" />
-        <q-input label="Sampling Rate" v-model.number="configuration['config']['K4A_SAMPLING_RATE']" type="number" min="1"
+        <q-input label="Sampling Rate [Hz]" v-model.number="configuration['config']['K4A_SAMPLING_RATE']" type="number" min="1"
           max="30" />
         <q-select label="Color Resolution" v-model.number="configuration['config']['K4A_COLOR_RESOLUTION']"
           :options="deviceColorResolution" />
-        <q-select label="Depth Mode" v-model="configuration['config']['K4A_DEPTH_MODE']"
-          :options="depthModeOptions" />
+        <q-select label="Depth Mode" v-model="configuration['config']['K4A_DEPTH_MODE']" :options="depthModeOptions" />
         <q-input label="Remote Output Folder" v-model="configuration['config']['K4A_OUTPUT_FOLDER']" />
-        <q-select label="Device FPS" v-model="configuration['config']['K4A_KINECT_FPS']"
-          :options="deviceFPSOptions" />
-        <q-input label="Streaming Interval" v-model.number="configuration['config']['K4A_STREAM_INTERVAL']"
+        <q-select label="Device FPS" v-model="configuration['config']['K4A_KINECT_FPS']" :options="deviceFPSOptions" />
+        <q-input label="Streaming Interval [ms]" v-model.number="configuration['config']['K4A_STREAM_INTERVAL']"
           type="number" />
         <q-input label="Thumbnails Scale Factor" v-model.number="configuration['config']['K4A_THUMBNAIL_SCALE_FACTOR']"
           type="number" />
@@ -345,7 +355,7 @@ export default defineComponent({
     function toggle(kinect) {
       let command = 'stop'
       if (kinect.Reader !== 'running')
-        command = 'start' + separator + new Date().toISOString()//.replaceAll(':', '.') //+ uuidv4()
+        command = 'start' + separator + new Date().toISOString().replaceAll(':', '.') //+ uuidv4()
       mqtt.publish(kinect.TopicPrefix + '/' + kinect.StationId + '/ctrl', command)
     }
     /*
@@ -386,7 +396,7 @@ export default defineComponent({
       setTimeout(pingStatus, 3000)
     }
     function startAll() {
-      const acqId = new Date().toISOString()//.replaceAll(':', '.')
+      const acqId = new Date().toISOString().replaceAll(':', '.')
       mqtt.publish(
         'kv2/all/ctrl',
         'start' + separator + acqId
