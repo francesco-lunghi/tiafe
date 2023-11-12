@@ -105,13 +105,16 @@
         <q-input label="Station ID" v-model="configuration['config']['stationId']" autofocus />
         <q-input label="Station INFO" v-model="configuration['config']['stationInfo']" />
         <q-input label="Chunk Size (samples)" v-model.number="configuration['config']['chunkSize']" />
-        <q-input label="Sampling Rate [Hz]" v-model.number="configuration['config']['desiredSamplingRate']" type="number" min="1"/>
+        <q-input label="Sampling Rate [Hz]" v-model.number="configuration['config']['desiredSamplingRate']" type="number"
+          min="1" />
         <q-toggle label="Interpolate" v-model="configuration['config']['isInterpolated']" />
-        <q-input label="Maximum Interpolation Interval [ms]" v-model.number="configuration['config']['maxInterpolationIntervalMS']" min="0"/>
+        <q-input label="Maximum Interpolation Interval [ms]"
+          v-model.number="configuration['config']['maxInterpolationIntervalMS']" min="0" />
         <q-toggle label="Save AVI Stream" v-model="configuration['config']['saveAVIStream']" />
-        <q-input label="Streaming Interval [ms]" v-model.number="configuration['config']['streamingIntervalMS']" min="100"/>
-        <q-input label="Thumbnails Percentage" v-model.number="configuration['config']['thumbnailsPercent']"  min="5" step="5" max="100"
-          type="number" />
+        <q-input label="Streaming Interval [ms]" v-model.number="configuration['config']['streamingIntervalMS']"
+          min="100" />
+        <q-input label="Thumbnails Percentage" v-model.number="configuration['config']['thumbnailsPercent']" min="5"
+          step="5" max="100" type="number" />
         <!-- @keyup.enter="config_dialog = false" /> -->
       </q-card-section>
 
@@ -130,42 +133,25 @@
       <q-card-section class="q-pt-none">
         <q-input label="Station ID" v-model="configuration['config']['TIAK4A_STATION_ID']" autofocus />
         <q-input label="Station INFO" v-model="configuration['config']['TIAK4A_STATION_INFO']" />
-        <q-input label="Device Index" v-model.number="configuration['config']['K4A_INDEX']" />
+        <q-input label="Device Index" v-model.number="configuration['config']['INDEX']" />
         <q-input label="Send Interval [s]" v-model.number="configuration['config']['MQTT_SEND_INTERVAL']" type="number"
           min="0.5" />
-        <q-input label="Sampling Rate [Hz]" v-model.number="configuration['config']['K4A_SAMPLING_RATE']" type="number" min="1"
-          max="30" />
-        <q-select label="Color Resolution" v-model.number="configuration['config']['K4A_COLOR_RESOLUTION']"
+        <q-input label="Sampling Rate [Hz]" v-model.number="configuration['config']['SAMPLING_RATE']" type="number"
+          min="1" max="30" />
+        <q-select label="Color Resolution" v-model.number="configuration['config']['COLOR_RESOLUTION']"
           :options="deviceColorResolution" />
-        <q-select label="Depth Mode" v-model="configuration['config']['K4A_DEPTH_MODE']" :options="depthModeOptions" />
-        <q-input label="Remote Output Folder" v-model="configuration['config']['K4A_OUTPUT_FOLDER']" />
-        <q-select label="Device FPS" v-model="configuration['config']['K4A_KINECT_FPS']" :options="deviceFPSOptions" />
-        <q-input label="Streaming Interval [ms]" v-model.number="configuration['config']['K4A_STREAM_INTERVAL']"
-          type="number" />
-        <q-input label="Thumbnails Scale Factor" v-model.number="configuration['config']['K4A_THUMBNAIL_SCALE_FACTOR']"
-          type="number" />
-        <q-toggle label="Send All Frames" v-model="configuration['config']['K4A_SEND_ALL_FRAMES']" />
+        <q-select label="Depth Mode" v-model="configuration['config']['DEPTH_MODE']" :options="depthModeOptions" />
+        <q-input label="Remote Output Folder" v-model="configuration['config']['OUTPUT_FOLDER']" />
+        <q-select label="Device FPS" v-model="configuration['config']['K4A_FPS']" :options="deviceFPSOptions" />
+
+        <q-toggle label="Save AVI Stream" v-model="configuration['config']['SAVE_AVI_STREAM']" />
+        <q-input label="Streaming Interval [ms]" v-model.number="configuration['config']['STREAMING_INTERVAL_MS']"
+          min="100" />
+        <q-input label="Thumbnails Percentage" v-model.number="configuration['config']['THUMBNAIL_PERCENT']" min="5"
+          step="5" max="100" />
+        <q-toggle label="Send All Frames" v-model="configuration['config']['SEND_ALL_FRAMES']" />
 
 
-
-        <!-- "TIAK4A_STATION_ID": "k4a_station1",
-    "TIAK4A_STATION_INFO": "sul tavolo",
-    "TIAK4A_LOG_LEVEL": "INFO",
-    "MQTT_HOST": "localhost",
-    "MQTT_HOST_LIVINGLAB": "192.168.1.149",
-    "MQTT_PORT": 1883,
-    "K4A_INDEX": 0,
-    "MQTT_TOPIC_PREFIX": "k4a",
-    "MQTT_SEND_INTERVAL": 2,
-    "K4A_SAMPLING_RATE": 30,
-    "K4A_COLOR_RESOLUTION": 720,
-    "K4A_DEPTH_MODE": "WFOV_2X2BINNED",
-    "K4A_OUTPUT_FOLDER":"./img",
-    "K4A_KINECT_FPS": 30,
-    "K4A_SEND_ALL_FRAMES": false,
-    "K4A_STREAM_INTERVAL": -1,
-    "K4A_THUMBNAIL_SCALE_FACTOR": 0.2,
-    "K4A_VERSION": "4.0" -->
 
       </q-card-section>
 
