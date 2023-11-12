@@ -84,11 +84,12 @@
               <q-tooltip>Start/Stop</q-tooltip>
             </q-btn>
             <!--:color="getColorFromPreview(k)"-->
-            <q-btn flat round icon="camera" @click="takeSnapshot(k)" size="1.5em">
+            <q-btn flat round icon="photo_camera" @click="takeSnapshot(k)" size="1.5em">
               <q-tooltip>Snapshot</q-tooltip></q-btn>
             <!-- <q-toggle :disable="k.reader == 'running'" :modelValue="getSaveAvi(k)" @update:modelValue="toggleSaveAvi(k)"
               label="AVI" /> -->
             <q-btn flat icon="settings" @click="getConfig(k)" size="1.5em"><q-tooltip>Config</q-tooltip></q-btn>
+            <q-btn flat icon="view_in_ar" @click="getCalibration(k)" size="1.5em"><q-tooltip>Calibration</q-tooltip></q-btn>
 
           </div>
         </q-item-section>
@@ -375,6 +376,10 @@ export default defineComponent({
       let command = 'getconfig'// + kinect.SamplingRate
       mqtt.publish(kinect.TopicPrefix + '/' + kinect.StationId + '/ctrl', command)
     }
+    function getCalibration(kinect) {
+      let command = 'getcalibration'// + kinect.SamplingRate
+      mqtt.publish(kinect.TopicPrefix + '/' + kinect.StationId + '/ctrl', command)
+    }
     function disconnectStation(kinect) {
       // if (kinect.version == 'k4a')
 
@@ -424,6 +429,7 @@ export default defineComponent({
       getSaveAvi,
       setSamplingRate,
       getConfig,
+      getCalibration,
       toggleSaveAvi,
       disconnectStation,
       config_dialog_k4a,
