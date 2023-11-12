@@ -131,9 +131,9 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-input label="Station ID" v-model="configuration['config']['TIAK4A_STATION_ID']" autofocus />
-        <q-input label="Station INFO" v-model="configuration['config']['TIAK4A_STATION_INFO']" />
-        <q-input label="Device Index" v-model.number="configuration['config']['INDEX']" />
+        <q-input label="Station ID" v-model="configuration['config']['STATION_ID']" autofocus />
+        <q-input label="Station INFO" v-model="configuration['config']['STATION_INFO']" />
+        <q-input label="Device Index" v-model.number="configuration['config']['K4A_INDEX']" />
         <q-input label="Send Interval [s]" v-model.number="configuration['config']['MQTT_SEND_INTERVAL']" type="number"
           min="0.5" />
         <q-input label="Sampling Rate [Hz]" v-model.number="configuration['config']['SAMPLING_RATE']" type="number"
