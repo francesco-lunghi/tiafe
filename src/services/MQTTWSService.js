@@ -51,6 +51,8 @@ class MQTTWSService {
     context.invocationContext.client.subscribe('k4a/+/snapshot')
     context.invocationContext.client.subscribe('kv2/+/config')
     context.invocationContext.client.subscribe('k4a/+/config')
+    context.invocationContext.client.subscribe('kv2/+/calibration')
+    context.invocationContext.client.subscribe('k4a/+/calibration')
     context.invocationContext.publish('kv2/all/ctrl', 'status')
     context.invocationContext.publish('k4a/all/ctrl', 'status')
     //subscribe('kv2/kinect1/skeletons')

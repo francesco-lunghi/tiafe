@@ -89,7 +89,8 @@
             <!-- <q-toggle :disable="k.reader == 'running'" :modelValue="getSaveAvi(k)" @update:modelValue="toggleSaveAvi(k)"
               label="AVI" /> -->
             <q-btn flat icon="settings" @click="getConfig(k)" size="1.5em"><q-tooltip>Config</q-tooltip></q-btn>
-            <q-btn flat icon="view_in_ar" @click="getCalibration(k)" size="1.5em"><q-tooltip>Calibration</q-tooltip></q-btn>
+            <q-btn flat icon="view_in_ar" @click="getCalibration(k)"
+              size="1.5em"><q-tooltip>Calibration</q-tooltip></q-btn>
 
           </div>
         </q-item-section>
@@ -162,6 +163,68 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
+
+  <q-dialog v-model="calibration_dialog" persistent>
+    <q-card style="min-width: 650px">
+      <q-card-section>
+        <div class="text-h6">Calibration</div>
+      </q-card-section>
+      <q-card-section class="q-pt-md q-pb-md">
+        <!-- <q-input
+          v-for=""
+          :key="rowIndex"
+          v-model="calibration['calibration']['R'][rowIndex]"
+          :label="'Row ' + (rowIndex + 1)"
+        > -->
+        <div class="text-h7">R</div>
+        <table>
+          <tr v-for="(row, rowIndex) in calibration['calibration']['R']" :key="rowIndex">
+            <td v-for="(value, colIndex) in row" :key="colIndex">
+              <q-input dense filled v-model.number="calibration['calibration']['R'][rowIndex][colIndex]" type="number" />
+            </td>
+          </tr>
+        </table>
+
+        <div class="text-h7">T</div>
+        <table>
+          <tr>
+            <td v-for="(value, colIndex) in calibration['calibration']['t']" :key="colIndex">
+              <q-input dense filled v-model.number="calibration['calibration']['t'][colIndex]" type="number" />
+            </td>
+          </tr>
+        </table>
+        <div class="q-mt-md text-h7">Rg</div>
+        <table>
+          <tr v-for="(row, rowIndex) in calibration['calibration']['Rg']" :key="rowIndex">
+            <td v-for="(value, colIndex) in row" :key="colIndex">
+              <q-input dense filled v-model.number="calibration['calibration']['Rg'][rowIndex][colIndex]" type="number" />
+            </td>
+          </tr>
+        </table>
+
+        <div class="text-h7">Tg</div>
+        <table>
+          <tr>
+            <td v-for="(value, colIndex) in calibration['calibration']['tg']" :key="colIndex">
+              <q-input dense filled v-model.number="calibration['calibration']['tg'][colIndex]" type="number" />
+            </td>
+          </tr>
+        </table>
+        <div class="q-mt-md text-h7">Additional info</div>
+        <q-input dense filled v-model="calibration['calibration']['AdditionalInfo']" />
+        <!-- </q-input> -->
+        <!-- @keyup.enter="config_dialog = false" /> -->
+
+      </q-card-section>
+
+      <q-card-actions align="right" class="text-primary">
+        <input type="file" @change="handleFileChange" />
+        <q-btn flat label="Save" @click="saveData" />
+        <q-btn flat label="Cancel" v-close-popup />
+        <q-btn flat label="Upload" @click="uploadCalibration()" v-close-popup />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script>
@@ -178,14 +241,15 @@ export default defineComponent({
     const kinects = reactive({})
     const config_dialog_kv2 = ref(false);
     const config_dialog_k4a = ref(false);
+    const calibration_dialog = ref(false);
     const configuration = reactive({})
+    const calibration = reactive({})
     const previews = reactive({})
     const refreshIntervalId = ref(null);
     const separator = "|"
     const depthModeOptions = ["NFOV_2X2BINNED", "NFOV_UNBINNED", "WFOV_2X2BINNED", "WFOV_UNBINNED", "PASSIVE_IR"]
     const deviceFPSOptions = [5, 15, 30]
     const deviceColorResolution = [720, 1080]
-
 
     onMounted(() => {
       if (!mqtt.isConnected())
@@ -212,7 +276,44 @@ export default defineComponent({
       if (status) return 'green'
       else return 'grey'
     }
+    const saveData = () => {
+      const jsonData = JSON.stringify(calibration['calibration']);
+      const blob = new Blob([jsonData], { type: 'application/json' });
 
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'calibration.json';
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+    function handleFileChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        readJsonFromFile(file);
+      }
+    }
+    async function readJsonFromFile(file) {
+      try {
+        const content = await readFileContent(file);
+        calibration['calibration'] = JSON.parse(content);
+      } catch (error) {
+        alert('Error reading file:', error);
+      }
+    }
+    function readFileContent(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          resolve(event.target.result);
+        };
+        reader.onerror = (error) => {
+          reject(error);
+        };
+        reader.readAsText(file);
+      });
+    }
     function getColorFromActivity(activity) {
       if (activity === 'running') return 'primary'
       else if (activity === 'paused') return 'grey'
@@ -287,6 +388,13 @@ export default defineComponent({
           else if (version == 'k4a')
             config_dialog_k4a.value = true
           break
+        case 'calibration':
+          // ignore my own message
+          calibration["calibration"] = JSON.parse(message.payloadString)
+          calibration["topicPrefix"] = version
+          calibration["stationId"] = publisher
+          calibration_dialog.value = true
+          break
         case 'status':
           // ignore my own message
           const payload = JSON.parse(message.payloadString)
@@ -338,6 +446,10 @@ export default defineComponent({
     function uploadConfiguration() {
 
       mqtt.publish(configuration["topicPrefix"] + '/' + configuration["stationId"] + '/ctrl', 'setconfig' + separator + JSON.stringify(configuration["config"]))
+    }
+    function uploadCalibration() {
+
+      mqtt.publish(calibration["topicPrefix"] + '/' + calibration["stationId"] + '/ctrl', 'setcalibration' + separator + JSON.stringify(calibration["calibration"]))
     }
     function toggle(kinect) {
       let command = 'stop'
@@ -434,14 +546,28 @@ export default defineComponent({
       disconnectStation,
       config_dialog_k4a,
       config_dialog_kv2,
+      calibration_dialog,
       configuration,
+      calibration,
       depthModeOptions,
       deviceFPSOptions,
       deviceColorResolution,
-      uploadConfiguration
+      uploadConfiguration,
+      uploadCalibration,
+      handleFileChange,
+      saveData
     }
   },
 })
 </script>
 
-<style></style>
+<style>
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+td {
+  border: 1px solid #ccc;
+}
+</style>
